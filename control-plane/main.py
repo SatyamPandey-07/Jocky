@@ -13,10 +13,13 @@ import sys
 from pathlib import Path
 from typing import List
 
-# Ensure workspace root is in sys.path
+# Ensure workspace root and control-plane are in sys.path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+CP_DIR = Path(__file__).resolve().parent
 if str(WORKSPACE_ROOT) not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT))
+if str(CP_DIR) not in sys.path:
+    sys.path.insert(0, str(CP_DIR))
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect

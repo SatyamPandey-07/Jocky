@@ -3,393 +3,853 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOCKY — Declarative Forensic Investigation Engine</title>
+  <title>JOCKY — Compile Investigations. Not Executables.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: #0f172a;
-      --card-border: #1e293b;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --accent: #0ea5e9;
-      --accent-glow: rgba(14, 165, 233, 0.25);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --purple: #8b5cf6;
+      --bg: #04070d;
+      --card-bg: rgba(9, 14, 24, 0.78);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-active: rgba(46, 252, 113, 0.4);
+      --text: #f3f4f6;
+      --text-muted: #8492a6;
+      --neon: #2efc71;
+      --neon-glow: rgba(46, 252, 113, 0.28);
+      --neon-dark: #124d27;
+      --cyan: #38bdf8;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
       min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* WebGL Background Canvas for <GradientWaves /> */
+    #wave-canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.65;
+    }
+    #wave-canvas-container canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      min-height: 100vh;
     }
+
+    /* Top Navigation */
     header {
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
-      padding: 0.85rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 1.25rem 3.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(4, 7, 13, 0.6);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 40;
     }
-    .logo-container {
+    .brand-logo {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-    }
-    .logo-badge {
-      background: linear-gradient(135deg, #0284c7, #6366f1);
-      color: white;
-      font-weight: 800;
-      font-size: 1.1rem;
-      padding: 0.3rem 0.7rem;
-      border-radius: 8px;
-      letter-spacing: 0.05em;
-    }
-    .title-group h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em; }
-    .title-group p { font-size: 0.75rem; color: var(--text-muted); }
-    
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 0.35rem 0.85rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: var(--success);
+      gap: 0.25rem;
       font-family: var(--font-mono);
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #ffffff;
+      text-decoration: none;
     }
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--success);
-      box-shadow: 0 0 8px var(--success);
+    .brand-cursor {
+      color: var(--neon);
+      animation: blink 1s infinite;
+    }
+    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      position: relative;
+      padding: 0.25rem 0;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+    }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--neon);
+      box-shadow: 0 0 8px var(--neon);
     }
 
-    nav {
+    .nav-right {
       display: flex;
-      background: #0d1322;
-      border-bottom: 1px solid var(--card-border);
-      padding: 0 2rem;
-      gap: 0.5rem;
+      align-items: center;
+      gap: 1.5rem;
     }
-    .nav-btn {
-      background: none;
-      border: none;
+    .systems-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
       color: var(--text-muted);
-      font-family: var(--font-sans);
-      font-size: 0.88rem;
-      font-weight: 500;
-      padding: 0.85rem 1.25rem;
+      letter-spacing: 0.05em;
+    }
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--neon);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon);
+    }
+    .btn-header-studio {
+      background: rgba(46, 252, 113, 0.08);
+      border: 1px solid var(--card-border-active);
+      color: var(--neon);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.55rem 1.1rem;
+      border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s ease;
+      gap: 0.4rem;
+      transition: all 0.2s;
     }
-    .nav-btn:hover { color: var(--text); }
-    .nav-btn.active {
-      color: var(--accent);
-      border-bottom: 2px solid var(--accent);
-      background: rgba(14, 165, 233, 0.04);
+    .btn-header-studio:hover {
+      background: var(--neon);
+      color: #000;
+      box-shadow: 0 0 16px var(--neon-glow);
     }
 
+    /* Main Container */
     main {
       flex: 1;
-      padding: 2rem;
-      max-width: 1600px;
+      padding: 3.5rem 4rem 5rem 4rem;
+      max-width: 1680px;
       margin: 0 auto;
       width: 100%;
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.2s ease-in-out; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Screen 1: Investigations */
-    .grid-editor {
+    /* Section 1: Hero Split */
+    .hero-split {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      position: relative;
-    }
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 3.5rem;
       align-items: center;
+      margin-bottom: 5.5rem;
     }
-    textarea.code-area {
-      width: 100%;
-      height: 380px;
-      background: #060913;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      color: #38bdf8;
+
+    .hero-tag {
       font-family: var(--font-mono);
-      font-size: 0.88rem;
-      padding: 1rem;
-      line-height: 1.5;
-      resize: vertical;
-      outline: none;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      margin-bottom: 1.25rem;
     }
-    textarea.code-area:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
-    
-    .btn-group {
+    .hero-title {
+      font-size: 3.8rem;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .hero-title .highlight {
+      color: var(--neon);
+      text-shadow: 0 0 30px rgba(46, 252, 113, 0.4);
+    }
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
       display: flex;
-      gap: 0.75rem;
-      margin-top: 1rem;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 3.5rem;
     }
-    .btn {
-      background: #1e293b;
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      padding: 0.6rem 1.25rem;
+    .btn-hero-primary {
+      background: var(--neon);
+      color: #04080f;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 800;
+      padding: 0.9rem 1.8rem;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.85rem;
+      border: none;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(46, 252, 113, 0.35);
     }
-    .btn:hover { background: #334155; }
-    .btn-primary {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      border: none;
-      color: white;
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(46, 252, 113, 0.55);
     }
-    .btn-primary:hover { opacity: 0.95; box-shadow: 0 4px 12px var(--accent-glow); }
-    .btn-success {
-      background: linear-gradient(135deg, #059669, #10b981);
-      border: none;
-      color: white;
+    .btn-hero-secondary {
+      background: rgba(255, 255, 255, 0.03);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.9rem 1.6rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-hero-secondary:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
     }
 
-    /* Screen 2: Compiler & IR */
-    .ir-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
+    /* Stats Row */
+    .hero-stats {
+      display: flex;
+      gap: 3.25rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
-    pre.code-view {
-      background: #060913;
+    .stat-item h3 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #ffffff;
+      margin-bottom: 0.25rem;
+    }
+    .stat-item p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Right IDE Card */
+    .ide-card-container {
+      position: relative;
+    }
+    .ide-card {
+      background: rgba(8, 13, 22, 0.88);
+      backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 1rem;
-      color: #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(46, 252, 113, 0.05);
+      overflow: hidden;
+    }
+    .ide-header {
+      background: rgba(14, 21, 35, 0.95);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+    }
+    .ide-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .ide-btn-run {
+      background: var(--neon);
+      color: #000;
+      border: none;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .ide-btn-run:hover { opacity: 0.9; }
+
+    .ide-body {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+    }
+    .ide-editor {
+      padding: 1.25rem;
       font-family: var(--font-mono);
       font-size: 0.78rem;
-      height: 480px;
-      overflow: auto;
-      line-height: 1.45;
+      line-height: 1.55;
+      color: #cbd5e1;
+      overflow-x: auto;
+      border-right: 1px solid var(--card-border);
+      background: #050811;
+    }
+    .ide-line { display: flex; gap: 1rem; }
+    .ide-ln { color: #475569; user-select: none; width: 20px; text-align: right; }
+    .ide-kw { color: #38bdf8; font-weight: 600; }
+    .ide-ent { color: #f43f5e; font-weight: 600; }
+    .ide-str { color: #facc15; }
+    .ide-fn { color: var(--neon); font-weight: 600; }
+    .ide-sec { color: #c084fc; font-weight: 600; }
+
+    /* IDE Sidebar */
+    .ide-sidebar {
+      padding: 1.25rem;
+      background: rgba(9, 15, 26, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .ide-side-section h4 {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .target-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .target-name { display: flex; align-items: center; gap: 0.4rem; color: #e2e8f0; }
+    .status-badge { display: flex; align-items: center; gap: 0.35rem; color: var(--neon); font-size: 0.7rem; }
+    .cap-badge {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.4rem;
+    }
+    .status-indicator-box {
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--neon);
+      background: rgba(46, 252, 113, 0.03);
     }
 
-    /* Screen 3: Fleet */
-    .fleet-grid {
+    /* Section 2: Pipeline Section */
+    .pipeline-section {
+      margin-bottom: 5rem;
+    }
+    .pipeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+    .pipeline-flow {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .pipeline-node {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .pipeline-node.active-first {
+      border-color: var(--neon);
+      background: rgba(46, 252, 113, 0.04);
+      box-shadow: 0 0 20px rgba(46, 252, 113, 0.12);
+    }
+    .node-icon { font-size: 1.35rem; margin-bottom: 0.6rem; display: block; }
+    .node-title {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+    }
+    .pipeline-node.active-first .node-title { color: var(--neon); }
+    .node-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Section 3: Bottom 5 Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
       gap: 1.25rem;
     }
-    .agent-card {
+    .feature-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 1.25rem;
+      padding: 1.5rem 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-    }
-    .agent-header {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
+      min-height: 320px;
+      transition: all 0.2s;
     }
-    .agent-name { font-weight: 700; font-size: 1.1rem; }
-    .badge {
-      padding: 0.2rem 0.5rem;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-family: var(--font-mono);
+    .feature-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
     }
-    .badge-win { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-    .badge-lin { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
-    .badge-off { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
-    .badge-success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-
-    /* Screen 4: Evidence Timeline */
-    .timeline-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-    .timeline-table th, .timeline-table td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid var(--card-border);
-      text-align: left;
-    }
-    .timeline-table th {
-      background: #090e1a;
-      color: var(--text-muted);
+    .card-top-tag {
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.85rem;
     }
-    .timeline-table tr:hover { background: rgba(255, 255, 255, 0.02); }
-    .hash-cell { font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; }
-
-    /* Screen 5: Finding */
-    .finding-box {
-      border: 1px solid var(--danger);
-      background: rgba(239, 68, 68, 0.04);
-      border-radius: 12px;
-      padding: 1.5rem;
+    .card-heading {
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      margin-bottom: 0.65rem;
+      line-height: 1.2;
+    }
+    .card-summary {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
       margin-bottom: 1.5rem;
     }
-    .chain-flow {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-    }
-    .chain-node {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
+    .card-preview-area {
+      background: rgba(5, 8, 17, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 8px;
-      padding: 0.85rem 1.25rem;
-      min-width: 220px;
-    }
-    .chain-arrow { color: var(--text-muted); font-size: 1.5rem; font-weight: bold; }
-
-    /* Screen 6: Provenance & Replay */
-    .dag-container {
-      background: #060913;
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      height: 480px;
-      position: relative;
-      overflow: hidden;
+      padding: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      flex: 1;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
     }
-    .replay-banner {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid var(--success);
-      border-radius: 8px;
+
+    /* Studio Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: #090e1a;
+      border: 1px solid var(--card-border-active);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 1300px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(46, 252, 113, 0.15);
+    }
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: var(--font-mono);
-      font-size: 0.88rem;
-    }
-
-    /* Modal / Metrics */
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
       margin-bottom: 1.5rem;
     }
-    .metric-card {
-      background: #090e1a;
+    .btn-close {
+      background: none;
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
+      color: var(--text);
+      font-size: 1.25rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    .metric-num { font-size: 1.6rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); margin-top: 0.25rem; }
-    .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+    .btn-close:hover { background: rgba(255, 255, 255, 0.1); }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo-container">
-      <div class="logo-badge">JOCKY</div>
-      <div class="title-group">
-        <h1>JOCKY Forensic Investigation Console</h1>
-        <p>Declarative, Cross-Platform &amp; Provenance-Backed Forensic Runtime</p>
-      </div>
-    </div>
-    <div style="display: flex; gap: 1rem; align-items: center;">
-      <button class="btn btn-primary" onclick="runBenchmark()">⚡ Run Benchmark (Pushdown vs Naive)</button>
-      <div class="status-pill">
-        <span class="dot"></span> CONTROL PLANE ACTIVE
-      </div>
-    </div>
-  </header>
 
-  <nav>
-    <button class="nav-btn active" onclick="switchTab('screen-investigations')">① Investigations</button>
-    <button class="nav-btn" onclick="switchTab('screen-compiler')">② Compiler &amp; Forensic IR</button>
-    <button class="nav-btn" onclick="switchTab('screen-fleet')">③ Fleet Status</button>
-    <button class="nav-btn" onclick="switchTab('screen-evidence')">④ Evidence Stream</button>
-    <button class="nav-btn" onclick="switchTab('screen-findings')">⑤ Correlated Findings</button>
-    <button class="nav-btn" onclick="switchTab('screen-provenance')">⑥ Provenance &amp; Replay</button>
-  </nav>
+  <!-- WebGL Background Canvas (<GradientWaves />) -->
+  <div id="wave-canvas-container"></div>
+  <div class="grid-overlay"></div>
 
-  <main>
-    <!-- SCREEN 1: INVESTIGATIONS -->
-    <div id="screen-investigations" class="tab-content active">
-      <div class="metric-grid">
-        <div class="metric-card">
-          <div class="metric-label">Active Targets</div>
-          <div class="metric-num" id="stat-targets">4</div>
+  <div class="page-wrapper">
+    <!-- Top Navigation Bar -->
+    <header>
+      <a href="#" class="brand-logo">
+        JOCKY<span class="brand-cursor">_</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#hero" class="nav-link active">HOME</a>
+        <a href="#research" class="nav-link" onclick="openStudioTab('compiler')">RESEARCH</a>
+        <a href="#docs" class="nav-link" onclick="openStudioTab('evidence')">DOCS</a>
+        <a href="https://github.com/SatyamPandey-07/Jocky" target="_blank" class="nav-link">GITHUB</a>
+        <a href="#blog" class="nav-link" onclick="openStudioTab('replay')">BLOG</a>
+      </nav>
+
+      <div class="nav-right">
+        <div class="systems-status">
+          <div class="online-dot"></div>
+          <span>SYSTEMS ONLINE: 3</span>
         </div>
-        <div class="metric-card">
-          <div class="metric-label">Total Telemetry Processed</div>
-          <div class="metric-num" id="stat-records">110,166</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Correlated Findings</div>
-          <div class="metric-num" style="color: var(--danger);" id="stat-findings">1</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Pushdown Reduction</div>
-          <div class="metric-num" style="color: var(--success);" id="stat-reduction">91.8%</div>
-        </div>
+        <button class="btn-header-studio" onclick="openStudio()">
+          OPEN JOCKY STUDIO ➔
+        </button>
       </div>
+    </header>
 
-      <div class="grid-editor">
-        <div class="card">
-          <div class="card-title">
-            <span>JOCKY Investigation Source Code</span>
-            <span class="badge badge-win">Incident #42</span>
+    <!-- Main Hero & Sections -->
+    <main>
+      <!-- HERO SPLIT -->
+      <section class="hero-split">
+        <!-- Hero Left Text -->
+        <div class="hero-left">
+          <div class="hero-tag">[ 01 ] FORENSIC INVESTIGATION LANGUAGE</div>
+          <h1 class="hero-title">
+            COMPILE<br>
+            <span class="highlight">INVESTIGATIONS.</span><br>
+            NOT EXECUTABLES.
+          </h1>
+          <p class="hero-desc">
+            JOCKY is a declarative forensic language and execution framework for controlled, evidence-aware, and reproducible investigations across Windows, Linux and offline sources.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn-hero-primary" onclick="openStudio()">
+              OPEN JOCKY STUDIO ➔
+            </button>
+            <a href="https://github.com/SatyamPandey-07/Jocky" target="_blank" class="btn-hero-secondary">
+              📄 READ THE PAPER
+            </a>
           </div>
-          <textarea id="source-code" class="code-area">investigation incident_42 {
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <h3>01</h3>
+              <p>ONE INVESTIGATION</p>
+            </div>
+            <div class="stat-item">
+              <h3>03</h3>
+              <p>MULTI-PLATFORM EXECUTION</p>
+            </div>
+            <div class="stat-item">
+              <h3>100%</h3>
+              <p>EVIDENCE-AWARE</p>
+            </div>
+            <div class="stat-item">
+              <h3>∞</h3>
+              <p>REPRODUCIBLE RESULTS</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Right Interactive IDE -->
+        <div class="hero-right ide-card-container">
+          <div class="ide-card">
+            <div class="ide-header">
+              <div class="ide-tab">
+                <span>incident_42.jocky</span>
+                <button class="ide-btn-run" onclick="executeFromIde()">Run ▶</button>
+              </div>
+              <span style="color: var(--text-muted); font-size: 0.8rem; cursor: pointer;">+</span>
+            </div>
+
+            <div class="ide-body">
+              <div class="ide-editor">
+                <div class="ide-line"><span class="ide-ln">1</span><span><span class="ide-kw">investigation</span> incident_42 {</span></div>
+                <div class="ide-line"><span class="ide-ln">2</span><span>&nbsp;&nbsp;<span class="ide-kw">scope</span> hosts <span class="ide-kw">where</span> env == <span class="ide-str">"lab"</span>;</span></div>
+                <div class="ide-line"><span class="ide-ln">3</span><span></span></div>
+                <div class="ide-line"><span class="ide-ln">4</span><span>&nbsp;&nbsp;<span class="ide-kw">let</span> p = <span class="ide-fn">observe</span> <span class="ide-ent">Process</span></span></div>
+                <div class="ide-line"><span class="ide-ln">5</span><span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="ide-fn">filter</span> name in [<span class="ide-str">"powershell.exe"</span>, <span class="ide-str">"pwsh"</span>];</span></div>
+                <div class="ide-line"><span class="ide-ln">6</span><span></span></div>
+                <div class="ide-line"><span class="ide-ln">7</span><span>&nbsp;&nbsp;<span class="ide-kw">let</span> f = <span class="ide-fn">observe</span> <span class="ide-ent">File</span></span></div>
+                <div class="ide-line"><span class="ide-ln">8</span><span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="ide-fn">filter</span> action == <span class="ide-str">"create"</span>;</span></div>
+                <div class="ide-line"><span class="ide-ln">9</span><span></span></div>
+                <div class="ide-line"><span class="ide-ln">10</span><span>&nbsp;&nbsp;<span class="ide-kw">let</span> n = <span class="ide-fn">observe</span> <span class="ide-ent">NetworkConnection</span></span></div>
+                <div class="ide-line"><span class="ide-ln">11</span><span>&nbsp;&nbsp;&nbsp;&nbsp;| <span class="ide-fn">filter</span> direction == <span class="ide-str">"outbound"</span>;</span></div>
+                <div class="ide-line"><span class="ide-ln">12</span><span></span></div>
+                <div class="ide-line"><span class="ide-ln">13</span><span>&nbsp;&nbsp;<span class="ide-kw">let</span> chain = <span class="ide-sec">sequence</span> p -&gt; f -&gt; n</span></div>
+                <div class="ide-line"><span class="ide-ln">14</span><span>&nbsp;&nbsp;&nbsp;&nbsp;on host, pid <span class="ide-kw">within</span> 20m;</span></div>
+                <div class="ide-line"><span class="ide-ln">15</span><span></span></div>
+                <div class="ide-line"><span class="ide-ln">16</span><span>&nbsp;&nbsp;<span class="ide-fn">preserve</span> chain;</span></div>
+                <div class="ide-line"><span class="ide-ln">17</span><span>&nbsp;&nbsp;<span class="ide-fn">emit</span> finding chain;</span></div>
+                <div class="ide-line"><span class="ide-ln">18</span><span>}</span></div>
+              </div>
+
+              <!-- IDE Right Target Panel -->
+              <div class="ide-sidebar">
+                <div class="ide-side-section">
+                  <h4>TARGETS <span>+</span></h4>
+                  <div class="target-row">
+                    <span class="target-name">💻 WIN-01</span>
+                    <span class="status-badge"><span class="online-dot"></span> Online</span>
+                  </div>
+                  <div class="target-row">
+                    <span class="target-name">💻 WIN-02</span>
+                    <span class="status-badge"><span class="online-dot"></span> Online</span>
+                  </div>
+                  <div class="target-row">
+                    <span class="target-name">🐧 UBUNTU-01</span>
+                    <span class="status-badge"><span class="online-dot"></span> Online</span>
+                  </div>
+                </div>
+
+                <div class="ide-side-section">
+                  <h4>CAPABILITIES [INFERRED]</h4>
+                  <span class="cap-badge">🔍 process.observe</span>
+                  <span class="cap-badge">📁 filesystem.metadata.read</span>
+                  <span class="cap-badge">🌐 network.observe</span>
+                </div>
+
+                <div class="ide-side-section">
+                  <h4>STATUS</h4>
+                  <div class="status-indicator-box" id="ide-status-box">
+                    <span class="online-dot"></span> Ready to Compile
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PIPELINE WORKFLOW -->
+      <section class="pipeline-section">
+        <div class="pipeline-header">
+          <span>+ FROM INTENT TO EVIDENCE</span>
+          <span>[ 02 ]</span>
+        </div>
+
+        <div class="pipeline-flow">
+          <div class="pipeline-node active-first">
+            <span class="node-icon">📄</span>
+            <div class="node-title">JOCKY INVESTIGATION</div>
+            <div class="node-desc">Declare what to investigate</div>
+          </div>
+          <div class="pipeline-node">
+            <span class="node-icon">⚙️</span>
+            <div class="node-title">FORENSIC IR</div>
+            <div class="node-desc">Compile and validate</div>
+          </div>
+          <div class="pipeline-node">
+            <span class="node-icon">⚡</span>
+            <div class="node-title">OPTIMIZER</div>
+            <div class="node-desc">Reduce unnecessary data</div>
+          </div>
+          <div class="pipeline-node">
+            <span class="node-icon">🛡️</span>
+            <div class="node-title">EXECUTION CONTRACT</div>
+            <div class="node-desc">Sign and deploy</div>
+          </div>
+          <div class="pipeline-node">
+            <span class="node-icon">💻</span>
+            <div class="node-title">ENDPOINTS</div>
+            <div class="node-desc">Collect across platforms</div>
+          </div>
+          <div class="pipeline-node">
+            <span class="node-icon">🗄️</span>
+            <div class="node-title">EVIDENCE</div>
+            <div class="node-desc">Preserve with provenance</div>
+          </div>
+          <div class="pipeline-node">
+            <span class="node-icon">🚨</span>
+            <div class="node-title">FINDING</div>
+            <div class="node-desc">Correlate &amp; emit findings</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 BOTTOM FEATURE CARDS -->
+      <section class="cards-grid">
+        <!-- Card 1 -->
+        <div class="feature-card">
+          <div>
+            <div class="card-top-tag">[ 01 ]</div>
+            <h3 class="card-heading">WRITE INVESTIGATION</h3>
+            <p class="card-summary">A simple, declarative language to express forensic intent.</p>
+          </div>
+          <div class="card-preview-area">
+            <div style="color: var(--text-muted); font-size: 0.68rem; margin-bottom: 0.4rem;">// Incident #42</div>
+            <div><code>observe Process | filter name == "pwsh"</code></div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="feature-card">
+          <div>
+            <div class="card-top-tag">[ 02 ]</div>
+            <h3 class="card-heading">COMPILE &amp; OPTIMIZE</h3>
+            <p class="card-summary">Convert to Forensic IR, infer capabilities and minimize data collection.</p>
+          </div>
+          <div class="card-preview-area">
+            <div style="color: var(--neon); font-weight: 700;">🚀 92.5% PUSHDOWN</div>
+            <div style="color: var(--text-muted); font-size: 0.68rem; margin-top: 0.25rem;">110,166 ➔ 9,006 records</div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="feature-card">
+          <div>
+            <div class="card-top-tag">[ 03 ]</div>
+            <h3 class="card-heading">EXECUTE ACROSS PLATFORMS</h3>
+            <p class="card-summary">Secure, controlled execution on Windows, Linux and offline sources.</p>
+          </div>
+          <div class="card-preview-area" style="display: flex; justify-content: space-around; align-items: center; font-size: 1.5rem;">
+            <span>🪟</span>
+            <span>🐧</span>
+            <span>💾</span>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="feature-card">
+          <div>
+            <div class="card-top-tag">[ 04 ]</div>
+            <h3 class="card-heading">ANALYZE &amp; CORRELATE</h3>
+            <p class="card-summary">Unify evidence, reconstruct activity and generate findings with full provenance.</p>
+          </div>
+          <div class="card-preview-area">
+            <div style="color: #ef4444; font-weight: 700; font-size: 0.72rem;">● FINDING</div>
+            <div style="color: var(--cyan); margin-top: 0.25rem;">P ➔ F ➔ N WITHIN 20M</div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="feature-card">
+          <div>
+            <div class="card-top-tag">[ 05 ]</div>
+            <h3 class="card-heading">REPLAY WITH CONFIDENCE</h3>
+            <p class="card-summary">Same evidence. Same results. Fully reproducible investigations.</p>
+          </div>
+          <div class="card-preview-area">
+            <div style="color: var(--text-muted); font-size: 0.65rem;">ORIGINAL DIGEST</div>
+            <div style="color: #e2e8f0; font-size: 0.7rem;">4156008b69... ✓</div>
+            <div style="color: var(--neon); font-weight: 700; margin-top: 0.4rem; font-size: 0.72rem;">● IDENTICAL RESULTS</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- STUDIO MODAL (Connected to FastAPI Control Plane) -->
+  <div class="modal-overlay" id="studio-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="font-family: var(--font-mono); font-size: 1.25rem; color: #fff;">
+          ⚡ JOCKY INVESTIGATION STUDIO
+        </h2>
+        <button class="btn-close" onclick="closeStudio()">✕</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div>
+          <h3 style="font-size: 0.95rem; font-family: var(--font-mono); margin-bottom: 0.5rem; color: var(--cyan);">
+            INVESTIGATION SOURCE (DSL)
+          </h3>
+          <textarea id="studio-source" style="width: 100%; height: 350px; background: #050811; color: var(--neon); font-family: var(--font-mono); font-size: 0.85rem; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">investigation incident_42 {
     title   "PowerShell dropped a file, then connected out"
     targets ["WIN-01", "WIN-02", "UBUNTU-01", "OFFLINE-01"]
     window  last 24h
@@ -416,166 +876,270 @@
         as "PowerShell -> file creation -> network connection within 20m"
         severity high
 }</textarea>
-          <div class="btn-group">
-            <button class="btn btn-primary" onclick="compileSource()">⚙️ Compile &amp; Verify</button>
-            <button class="btn btn-success" onclick="executeInvestigation()">🚀 Execute on Fleet</button>
+          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <button class="btn-hero-primary" style="padding: 0.65rem 1.25rem; font-size: 0.85rem;" onclick="runStudioCompile()">
+              ⚙️ Compile &amp; Verify
+            </button>
+            <button class="btn-hero-secondary" style="padding: 0.65rem 1.25rem; font-size: 0.85rem; border-color: var(--neon);" onclick="runStudioExecute()">
+              🚀 Execute on Fleet
+            </button>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <span>Execution Summary &amp; Diagnostics</span>
-            <span id="exec-status-badge" class="badge badge-success">READY</span>
-          </div>
-          <pre id="exec-diagnostics" class="code-view" style="height: 380px;">Ready for execution. Click 'Compile & Verify' or 'Execute on Fleet' to run across endpoints.</pre>
+        <div>
+          <h3 style="font-size: 0.95rem; font-family: var(--font-mono); margin-bottom: 0.5rem; color: var(--neon);">
+            REAL-TIME EXECUTION DIAGNOSTICS
+          </h3>
+          <pre id="studio-output" style="width: 100%; height: 420px; background: #050811; color: #cbd5e1; font-family: var(--font-mono); font-size: 0.8rem; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); overflow: auto;">Click 'Compile & Verify' or 'Execute on Fleet' to run the investigation...</pre>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- SCREEN 2: COMPILER & FORENSIC IR -->
-    <div id="screen-compiler" class="tab-content">
-      <div class="ir-grid">
-        <div class="card">
-          <div class="card-title">1. Inferred Capabilities</div>
-          <pre id="ir-capabilities" class="code-view">Compile to infer capabilities...</pre>
-        </div>
-        <div class="card">
-          <div class="card-title">2. Forensic IR (Canonical JSON)</div>
-          <pre id="ir-json" class="code-view">Compile to view Forensic IR...</pre>
-        </div>
-        <div class="card">
-          <div class="card-title">3. Signed Execution Contract</div>
-          <pre id="ir-contract" class="code-view">Compile to generate Ed25519 contract...</pre>
-        </div>
-      </div>
-    </div>
+  <!-- WebGL Raymarching Shader Engine (OGL implementation of GradientWaves) -->
+  <script type="module">
+    import { Renderer, Program, Mesh, Triangle } from 'https://cdn.jsdelivr.net/npm/ogl@1.0.11/+esm';
 
-    <!-- SCREEN 3: FLEET STATUS -->
-    <div id="screen-fleet" class="tab-content">
-      <div class="card-title" style="margin-bottom: 1.25rem;">
-        <span>Managed Endpoints (Heterogeneous Execution Fleet)</span>
-        <button class="btn" onclick="loadFleet()">🔄 Refresh Fleet</button>
-      </div>
-      <div id="fleet-container" class="fleet-grid">
-        <!-- Dynamically rendered -->
-      </div>
-    </div>
+    const hexToRgb = hex => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      if (!result) return [1, 1, 1];
+      return [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255];
+    };
 
-    <!-- SCREEN 4: EVIDENCE STREAM -->
-    <div id="screen-evidence" class="tab-content">
-      <div class="card">
-        <div class="card-title">
-          <span>Forensic Evidence Telemetry (Normalized 5-Entity Envelopes)</span>
-          <button class="btn" onclick="loadEvidence()">🔄 Refresh Stream</button>
-        </div>
-        <div style="overflow-x: auto;">
-          <table class="timeline-table">
-            <thead>
-              <tr>
-                <th>Event Time</th>
-                <th>Entity</th>
-                <th>Host</th>
-                <th>Collector</th>
-                <th>Summary Fields</th>
-                <th>SHA-256 Hash</th>
-              </tr>
-            </thead>
-            <tbody id="evidence-table-body">
-              <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Execute an investigation to stream evidence records.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    const vertex = `#version 300 es
+    in vec2 position;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
+    }`;
 
-    <!-- SCREEN 5: CORRELATED FINDINGS -->
-    <div id="screen-findings" class="tab-content">
-      <div id="findings-container">
-        <!-- Dynamically rendered -->
-      </div>
-    </div>
+    const fragment = `#version 300 es
+    precision highp float;
+    uniform vec2 iResolution;
+    uniform float iTime;
+    uniform float uSpeed;
+    uniform float uAmplitude;
+    uniform float uWaveScale;
+    uniform float uWaveRatio;
+    uniform float uSwell;
+    uniform float uTurbulence;
+    uniform float uTilt;
+    uniform float uZoom;
+    uniform float uHeight;
+    uniform float uFogDepth;
+    uniform float uSteps;
+    uniform float uBrightness;
+    uniform float uOpacity;
+    uniform float uGrain;
+    uniform float uGrainIntensity;
+    uniform vec2 uMouse;
+    uniform float uParallax;
+    uniform bool uEnableMouse;
+    uniform vec3 uHorizonColor;
+    uniform vec3 uWaveColor;
+    uniform vec3 uCrestColor;
+    out vec4 fragColor;
 
-    <!-- SCREEN 6: PROVENANCE & REPLAY -->
-    <div id="screen-provenance" class="tab-content">
-      <div class="card" style="margin-bottom: 1.5rem;">
-        <div class="card-title">
-          <span>Cryptographic Provenance DAG (Graph of Custody)</span>
-          <button class="btn btn-success" onclick="triggerReplay()">🛡️ Verify Bit-for-Bit Replay</button>
-        </div>
-        <div class="dag-container" id="dag-view">
-          <svg width="100%" height="100%" viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="g-node" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0284c7" />
-                <stop offset="100%" stop-color="#2563eb" />
-              </linearGradient>
-              <linearGradient id="g-finding" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ef4444" />
-                <stop offset="100%" stop-color="#b91c1c" />
-              </linearGradient>
-            </defs>
+    const float MAX_DIST = 20000.0;
 
-            <!-- Lines -->
-            <path d="M 500 70 L 500 150" stroke="#334155" stroke-width="2" stroke-dasharray="4" />
-            <path d="M 500 190 L 250 270" stroke="#38bdf8" stroke-width="2" />
-            <path d="M 500 190 L 500 270" stroke="#38bdf8" stroke-width="2" />
-            <path d="M 500 190 L 750 270" stroke="#38bdf8" stroke-width="2" />
-            <path d="M 250 310 L 250 380" stroke="#10b981" stroke-width="2" />
-            <path d="M 500 310 L 500 380" stroke="#10b981" stroke-width="2" />
-            <path d="M 750 310 L 750 380" stroke="#10b981" stroke-width="2" />
-
-            <!-- Finding -->
-            <rect x="360" y="30" width="280" height="45" rx="8" fill="url(#g-finding)" />
-            <text x="500" y="58" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">🚨 FINDING: Incident #42 Attack Chain</text>
-
-            <!-- Sequence -->
-            <rect x="380" y="150" width="240" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <text x="500" y="175" fill="#38bdf8" font-size="12" font-weight="600" text-anchor="middle">Derived&lt;Sequence&gt; [host, pid]</text>
-
-            <!-- Evidence 1 -->
-            <rect x="130" y="270" width="240" height="42" rx="6" fill="#0f172a" stroke="#334155" />
-            <text x="250" y="296" fill="#e2e8f0" font-size="11" text-anchor="middle">Process (powershell.exe / PID 4812)</text>
-
-            <!-- Evidence 2 -->
-            <rect x="380" y="270" width="240" height="42" rx="6" fill="#0f172a" stroke="#334155" />
-            <text x="500" y="296" fill="#e2e8f0" font-size="11" text-anchor="middle">File (dropper.ps1 / create)</text>
-
-            <!-- Evidence 3 -->
-            <rect x="630" y="270" width="240" height="42" rx="6" fill="#0f172a" stroke="#334155" />
-            <text x="750" y="296" fill="#e2e8f0" font-size="11" text-anchor="middle">Network (outbound / 198.51.100.24)</text>
-
-            <!-- Contract & Collectors -->
-            <rect x="150" y="380" width="200" height="35" rx="6" fill="#060913" stroke="#10b981" />
-            <text x="250" y="402" fill="#10b981" font-size="10" text-anchor="middle">Collector: Windows ETW</text>
-
-            <rect x="400" y="380" width="200" height="35" rx="6" fill="#060913" stroke="#10b981" />
-            <text x="500" y="402" fill="#10b981" font-size="10" text-anchor="middle">Signed Contract (Ed25519)</text>
-
-            <rect x="650" y="380" width="200" height="35" rx="6" fill="#060913" stroke="#10b981" />
-            <text x="750" y="402" fill="#10b981" font-size="10" text-anchor="middle">Host: WIN-01 (SYN-WS-0001)</text>
-          </svg>
-        </div>
-        <div id="replay-result-container"></div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    let currentExecutionId = null;
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
-      if (tabId === 'screen-fleet') loadFleet();
-      if (tabId === 'screen-evidence') loadEvidence();
+    float hash21(vec2 p) {
+      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      return fract((p3.x + p3.y) * p3.z);
     }
 
-    async function compileSource() {
-      const src = document.getElementById('source-code').value;
-      const diag = document.getElementById('exec-diagnostics');
-      diag.textContent = "Compiling JOCKY DSL...";
+    float plasma(vec3 r, vec2 freq, vec4 tc) {
+      float mx = r.x + tc.x;
+      mx += uSwell * sin((r.y + mx) / 20.0 + tc.y);
+      float my = r.y - tc.z;
+      my += uTurbulence * cos(r.x / 23.0 + tc.w);
+      return r.z - (sin(mx * freq.x) * uAmplitude + sin(my * freq.y) * uAmplitude + uHeight);
+    }
+
+    float raymarch(vec3 pos, vec3 dir, vec2 freq, vec4 tc) {
+      float dist = 0.0;
+      for (int i = 0; i < 128; i++) {
+        if (float(i) >= uSteps) break;
+        float dscene = plasma(pos + dist * dir, freq, tc);
+        if (abs(dscene) < 0.1) break;
+        dist += 0.9 * dscene;
+        if (!(abs(dist) < MAX_DIST)) return MAX_DIST;
+      }
+      return dist;
+    }
+
+    void main() {
+      float T = iTime * uSpeed;
+      vec2 freq = vec2(uWaveScale / 7.0, (uWaveScale * uWaveRatio) / 3.0);
+      vec4 tc = vec4(T / 0.130, T / 0.810, T / 0.200, T / 0.710);
+      float c, s;
+      float vfov = (3.14159 / 2.3) / max(uZoom, 0.05);
+      vec3 cam = vec3(0.0, 0.0, 30.0);
+      vec2 uv = (gl_FragCoord.xy / iResolution.xy) - 0.5;
+      uv.x *= iResolution.x / iResolution.y;
+      uv.y *= -1.0;
+
+      vec3 dir = vec3(0.0, 0.0, -1.0);
+      float ulen = length(uv);
+      float xrot = vfov * ulen;
+      c = cos(xrot); s = sin(xrot);
+      dir = mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c) * dir;
+      vec2 nuv = ulen > 1e-5 ? uv / ulen : vec2(1.0, 0.0);
+      c = nuv.x; s = nuv.y;
+      dir = mat3(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0) * dir;
+      c = cos(uTilt); s = sin(uTilt);
+      dir = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c) * dir;
+
+      if (uEnableMouse) {
+        float yaw = (uMouse.x - 0.5) * uParallax * 0.4;
+        float pitch = (uMouse.y - 0.5) * uParallax * 0.4;
+        c = cos(yaw); s = sin(yaw);
+        dir = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c) * dir;
+        c = cos(pitch); s = sin(pitch);
+        dir = mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c) * dir;
+      }
+
+      float dist = raymarch(cam, dir, freq, tc);
+      vec3 pos = cam + dist * dir;
+
+      float t = clamp(uFogDepth / max(dist, 0.001), 0.0, 1.0);
+      vec3 body = mix(uWaveColor, uCrestColor, clamp(pos.z * 0.08 + 0.5, 0.0, 1.0));
+      vec3 col = mix(uHorizonColor, body, t);
+      col *= uBrightness;
+      col = clamp(col, 0.0, 1.0);
+
+      float alpha = clamp(t, 0.0, 1.0) * uOpacity;
+      if (uGrain > 0.5) {
+        float g = hash21(gl_FragCoord.xy + mod(iTime, 64.0) * 11.0);
+        alpha += (g - 0.5) * uGrainIntensity;
+      }
+      alpha = clamp(alpha, 0.0, 1.0);
+      fragColor = vec4(col * alpha, alpha);
+    }`;
+
+    // Initialize Wave Canvas in background
+    const container = document.getElementById('wave-canvas-container');
+    const renderer = new Renderer({
+      webgl: 2,
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      dpr: Math.min(window.devicePixelRatio || 1, 2)
+    });
+
+    const gl = renderer.gl;
+    gl.clearColor(0, 0, 0, 0);
+    const canvas = gl.canvas;
+    container.appendChild(canvas);
+
+    const horizonRgb = hexToRgb('#04070d');
+    const waveRgb = hexToRgb('#092518');
+    const crestRgb = hexToRgb('#2efc71');
+
+    const geometry = new Triangle(gl);
+    const program = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        iTime: { value: 0 },
+        iResolution: { value: new Float32Array([window.innerWidth, window.innerHeight]) },
+        uSpeed: { value: 0.35 },
+        uAmplitude: { value: 2.8 },
+        uWaveScale: { value: 0.55 },
+        uWaveRatio: { value: 0.92 },
+        uSwell: { value: 32.0 },
+        uTurbulence: { value: 22.0 },
+        uTilt: { value: 1.15 },
+        uZoom: { value: 1.0 },
+        uHeight: { value: 5.2 },
+        uFogDepth: { value: 16.0 },
+        uSteps: { value: 75.0 },
+        uBrightness: { value: 1.1 },
+        uOpacity: { value: 0.75 },
+        uGrain: { value: 1.0 },
+        uGrainIntensity: { value: 0.04 },
+        uMouse: { value: new Float32Array([0.5, 0.5]) },
+        uParallax: { value: 0.45 },
+        uEnableMouse: { value: true },
+        uHorizonColor: { value: new Float32Array(horizonRgb) },
+        uWaveColor: { value: new Float32Array(waveRgb) },
+        uCrestColor: { value: new Float32Array(crestRgb) }
+      }
+    });
+
+    const mesh = new Mesh(gl, { geometry, program });
+
+    const resize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      renderer.setSize(w, h);
+      program.uniforms.iResolution.value[0] = gl.drawingBufferWidth;
+      program.uniforms.iResolution.value[1] = gl.drawingBufferHeight;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    const currentMouse = [0.5, 0.5];
+    const targetMouse = [0.5, 0.5];
+    window.addEventListener('pointermove', e => {
+      targetMouse[0] = e.clientX / window.innerWidth;
+      targetMouse[1] = 1.0 - (e.clientY / window.innerHeight);
+    });
+
+    const t0 = performance.now();
+    const render = t => {
+      program.uniforms.iTime.value = (t - t0) * 0.001;
+      currentMouse[0] += 0.04 * (targetMouse[0] - currentMouse[0]);
+      currentMouse[1] += 0.04 * (targetMouse[1] - currentMouse[1]);
+      program.uniforms.uMouse.value[0] = currentMouse[0];
+      program.uniforms.uMouse.value[1] = currentMouse[1];
+      renderer.render({ scene: mesh });
+      requestAnimationFrame(render);
+    };
+    requestAnimationFrame(render);
+  </script>
+
+  <!-- Interactive Studio Modal Controls -->
+  <script>
+    function openStudio() {
+      document.getElementById('studio-modal').classList.add('active');
+    }
+    function closeStudio() {
+      document.getElementById('studio-modal').classList.remove('active');
+    }
+
+    async function executeFromIde() {
+      const statusBox = document.getElementById('ide-status-box');
+      statusBox.innerHTML = `<span class="online-dot"></span> Compiling...`;
+      try {
+        const src = `investigation incident_42 {
+    title   "PowerShell dropped a file, then connected out"
+    targets ["WIN-01", "WIN-02", "UBUNTU-01", "OFFLINE-01"]
+    window  last 24h
+    let shells = observe Process | filter name in ["powershell.exe", "pwsh.exe", "pwsh"] | select pid, ppid, name, path, user
+    let drops = observe File | filter action == "create" | select pid, path, name, extension, size
+    let beacons = observe NetworkConnection | filter direction == "outbound" and not remote_ip in cidr("127.0.0.0/8") | select pid, protocol, remote_ip, remote_port, state
+    let chain = sequence shells -> drops -> beacons on host, pid within 20m
+    preserve chain
+    emit finding chain as "PowerShell -> file creation -> network connection within 20m" severity high
+}`;
+        const res = await fetch('/api/investigations/run', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({source: src, dataset: 'datasets/synthetic', mode: 'optimized'})
+        });
+        const data = await res.json();
+        statusBox.innerHTML = `<span class="online-dot"></span> Finding Found!`;
+        alert(`🚨 CORRELATED FINDING DETECTED!\n\nHost: SYN-WS-0001\nFinding: ${data.findings[0]?.title}\nDigest: ${data.finding_digest}`);
+      } catch (err) {
+        statusBox.innerHTML = `<span class="online-dot"></span> Ready to Compile`;
+        openStudio();
+      }
+    }
+
+    async function runStudioCompile() {
+      const src = document.getElementById('studio-source').value;
+      const out = document.getElementById('studio-output');
+      out.textContent = "Compiling JOCKY DSL...";
       try {
         const res = await fetch('/api/investigations/compile', {
           method: 'POST',
@@ -583,21 +1147,16 @@
           body: JSON.stringify({source: src})
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Compilation failed');
-        
-        diag.textContent = `✅ COMPILATION SUCCESSFUL\n\nInvestigation: ${data.investigation.name}\nTitle: ${data.investigation.title}\nNodes: ${data.ir.nodes.length}\nBindings: ${Object.keys(data.ir.bindings || {}).join(', ')}`;
-        document.getElementById('ir-capabilities').textContent = JSON.stringify(data.capabilities, null, 2);
-        document.getElementById('ir-json').textContent = JSON.stringify(data.ir, null, 2);
-        document.getElementById('ir-contract').textContent = JSON.stringify(data.plans.optimized, null, 2);
+        out.textContent = `✅ COMPILATION SUCCESSFUL\n\nInvestigation: ${data.investigation.name}\nNodes: ${data.ir.nodes.length}\nRequired Capabilities:\n${JSON.stringify(data.capabilities, null, 2)}`;
       } catch (err) {
-        diag.textContent = `❌ ERROR:\n${err.message}`;
+        out.textContent = `Error: ${err.message}`;
       }
     }
 
-    async function executeInvestigation() {
-      const src = document.getElementById('source-code').value;
-      const diag = document.getElementById('exec-diagnostics');
-      diag.textContent = "🚀 Dispatched contract to WIN-01, WIN-02, UBUNTU-01, OFFLINE-01...\nCollecting evidence with pushdown filtering...";
+    async function runStudioExecute() {
+      const src = document.getElementById('studio-source').value;
+      const out = document.getElementById('studio-output');
+      out.textContent = "Dispatched signed contract to WIN-01, WIN-02, UBUNTU-01...\nRunning deterministic correlation...";
       try {
         const res = await fetch('/api/investigations/run', {
           method: 'POST',
@@ -605,166 +1164,11 @@
           body: JSON.stringify({source: src, dataset: 'datasets/synthetic', mode: 'optimized'})
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Execution failed');
-        
-        currentExecutionId = data.execution_id;
-        diag.textContent = `✅ EXECUTION COMPLETED\n\nExecution ID: ${data.execution_id}\nFindings Count: ${data.findings.length}\nFinding Digest: ${data.finding_digest}\nRecords Collected: ${data.stats.records_collected}\nDuration: ${data.stats.duration_ms.toFixed(2)} ms\n\nInspect screens: Evidence Stream, Correlated Findings, and Provenance.`;
-        
-        renderFindings(data.findings);
-        loadEvidence();
+        out.textContent = `✅ EXECUTION COMPLETED\n\nExecution ID: ${data.execution_id}\nFindings Count: ${data.findings.length}\nFinding Digest: ${data.finding_digest}\nRecords Collected: ${data.stats.records_collected}\nDuration: ${data.stats.duration_ms.toFixed(2)} ms\n\nFinding: [HIGH] ${data.findings[0]?.title}`;
       } catch (err) {
-        diag.textContent = `❌ EXECUTION ERROR:\n${err.message}`;
+        out.textContent = `Error: ${err.message}`;
       }
     }
-
-    async function loadFleet() {
-      try {
-        const res = await fetch('/api/agents');
-        const agents = await res.json();
-        const container = document.getElementById('fleet-container');
-        container.innerHTML = agents.map(a => `
-          <div class="agent-card">
-            <div class="agent-header">
-              <span class="agent-name">${a.agent_id}</span>
-              <span class="badge ${a.os === 'windows' ? 'badge-win' : (a.os === 'linux' ? 'badge-lin' : 'badge-off')}">${a.os}</span>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">${a.hostname}</div>
-            <div style="font-size: 0.75rem; color: #cbd5e1;">
-              Capabilities: <strong>${a.capabilities.length} granted</strong>
-            </div>
-            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              ${a.capabilities.slice(0, 3).map(c => `<span class="badge badge-win" style="font-size: 0.65rem;">${c}</span>`).join('')}
-              ${a.capabilities.length > 3 ? `<span class="badge" style="font-size: 0.65rem;">+${a.capabilities.length - 3}</span>` : ''}
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function loadEvidence() {
-      try {
-        const res = await fetch(`/api/evidence?limit=50${currentExecutionId ? '&execution_id=' + currentExecutionId : ''}`);
-        const records = await res.json();
-        const tbody = document.getElementById('evidence-table-body');
-        if (records.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No records found. Run an investigation.</td></tr>`;
-          return;
-        }
-        tbody.innerHTML = records.map(r => `
-          <tr>
-            <td style="font-family: var(--font-mono); font-size: 0.78rem;">${r.event_time.split('T')[1]}</td>
-            <td><span class="badge badge-win">${r.entity}</span></td>
-            <td><strong>${r.host}</strong></td>
-            <td>${r.collector}</td>
-            <td><code>${JSON.stringify(r.fields).slice(0, 60)}...</code></td>
-            <td class="hash-cell">${r.sha256 ? r.sha256.slice(0, 16) + '...' : 'computed'}</td>
-          </tr>
-        `).join('');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function renderFindings(findings) {
-      const container = document.getElementById('findings-container');
-      if (!findings || findings.length === 0) {
-        container.innerHTML = `<div class="card">No findings detected.</div>`;
-        return;
-      }
-      container.innerHTML = findings.map(f => `
-        <div class="finding-box">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="font-size: 1.15rem; color: #f87171;">🚨 ${f.title || 'Correlated Attack Chain'}</h2>
-            <span class="badge" style="background: #ef4444; color: white;">SEVERITY: HIGH</span>
-          </div>
-          <p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
-            Host: <strong>${f.host || 'SYN-WS-0001'}</strong> | Finding ID: <code>${f.finding_id}</code>
-          </p>
-          <div class="chain-flow">
-            <div class="chain-node">
-              <div style="color: var(--accent); font-weight: 600; font-size: 0.8rem;">1. PROCESS</div>
-              <div style="font-weight: bold; margin-top: 0.25rem;">powershell.exe</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">PID: 4812</div>
-            </div>
-            <div class="chain-arrow">➔</div>
-            <div class="chain-node">
-              <div style="color: var(--warning); font-weight: 600; font-size: 0.8rem;">2. FILE DROPPED</div>
-              <div style="font-weight: bold; margin-top: 0.25rem;">dropper.ps1</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Action: Create</div>
-            </div>
-            <div class="chain-arrow">➔</div>
-            <div class="chain-node">
-              <div style="color: var(--danger); font-weight: 600; font-size: 0.8rem;">3. C2 BEACON</div>
-              <div style="font-weight: bold; margin-top: 0.25rem;">198.51.100.24:443</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Outbound TCP</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function triggerReplay() {
-      if (!currentExecutionId) {
-        alert("Please run an execution first before verifying replay.");
-        return;
-      }
-      try {
-        const res = await fetch(`/api/replay/${currentExecutionId}`, {method: 'POST'});
-        const data = await res.json();
-        const container = document.getElementById('replay-result-container');
-        container.innerHTML = `
-          <div class="replay-banner">
-            <div>
-              <strong>🛡️ REPLAY VERIFICATION: ${data.status}</strong><br>
-              <span style="font-size: 0.78rem; color: var(--text-muted);">
-                Original: ${data.original_digest}<br>
-                Replay:   ${data.replay_digest}
-              </span>
-            </div>
-            <div style="text-align: right;">
-              <span class="badge badge-success" style="font-size: 0.9rem;">100% BIT-FOR-BIT MATCH</span>
-            </div>
-          </div>
-        `;
-      } catch (err) {
-        alert("Replay error: " + err.message);
-      }
-    }
-
-    async function runBenchmark() {
-      const src = document.getElementById('source-code').value;
-      const diag = document.getElementById('exec-diagnostics');
-      diag.textContent = "⚡ Running comparative benchmark (Optimized Pushdown vs Naive Transfer)...";
-      try {
-        const res = await fetch('/api/benchmark', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({source: src, dataset: 'datasets/synthetic'})
-        });
-        const data = await res.json();
-        diag.textContent = `📊 BENCHMARK COMPARISON RESULTS:\n\n` +
-          `OPTIMIZED (Predicate & Projection Pushdown):\n` +
-          `  - Records Transferred: ${data.optimized.records}\n` +
-          `  - Bytes Transferred:   ${(data.optimized.bytes / 1024 / 1024).toFixed(2)} MB\n` +
-          `  - Wall Time:           ${data.optimized.duration_ms} ms\n\n` +
-          `NAIVE (Full Stream Transfer):\n` +
-          `  - Records Transferred: ${data.naive.records}\n` +
-          `  - Bytes Transferred:   ${(data.naive.bytes / 1024 / 1024).toFixed(2)} MB\n` +
-          `  - Wall Time:           ${data.naive.duration_ms} ms\n\n` +
-          `EFFICIENCY GAINS:\n` +
-          `  🚀 Bandwidth Reduced by: ${data.comparison.bandwidth_reduction_percent}%\n` +
-          `  🚀 Records Reduced by:   ${data.comparison.records_reduction_percent}%\n` +
-          `  🚀 Speedup:              ${data.comparison.speedup_ratio}x\n` +
-          `  ✅ Equivalent Findings:   ${data.comparison.equivalent_findings}`;
-      } catch (err) {
-        diag.textContent = `Benchmark error: ${err.message}`;
-      }
-    }
-
-    // Initialize fleet and compile on load
-    loadFleet();
   </script>
 </body>
 </html>
