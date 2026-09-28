@@ -1,0 +1,20 @@
+{
+  "expected_findings": [
+    {
+      "host": "LAB-WS-01",
+      "pid": 4242
+    },
+    {
+      "host": "LAB-SRV-01",
+      "pid": 777
+    }
+  ],
+  "negative_controls": [
+    "LAB-WS-02 pid 5100: connection 45m after start (outside 20m)",
+    "LAB-WS-02 pid 5300: loopback connection (excluded by cidr filter)",
+    "LAB-WS-01 pid 4400: no file creation",
+    "LAB-WS-01 pid 3000: outside the 24h window",
+    "LAB-SRV-01 pid 900: connection precedes file creation (sequence order)",
+    "LAB-WS-02 pid 4242 (chrome): same pid as TP1 on another host"
+  ]
+}

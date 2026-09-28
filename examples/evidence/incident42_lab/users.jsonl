@@ -1,0 +1,3 @@
+{"host": "LAB-WS-01", "time": "2026-09-28T11:59:00.000000Z", "name": "alice", "uid": "S-1-5-21-100-0", "domain": "LAB", "home": "C:\\Users\\alice"}
+{"host": "LAB-WS-02", "time": "2026-09-28T11:59:00.000000Z", "name": "alice", "uid": "S-1-5-21-100-1", "domain": "LAB", "home": "C:\\Users\\alice"}
+{"host": "LAB-SRV-01", "time": "2026-09-28T11:59:00.000000Z", "name": "deploy", "uid": "1000", "domain": "", "home": "/home/deploy"}

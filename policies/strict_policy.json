@@ -1,0 +1,24 @@
+{
+  "name": "strict",
+  "version": 1,
+  "description": "Strict JOCKY read-only forensics policy denying sensitive command lines and raw file hashes.",
+  "default": {
+    "allow": [
+      "collect:process",
+      "collect:file",
+      "collect:network",
+      "collect:user",
+      "collect:event",
+      "preserve:records"
+    ],
+    "deny": [
+      "collect:process.cmdline",
+      "collect:file.hash"
+    ]
+  },
+  "targets": {
+    "UBUNTU-01": {
+      "deny": ["collect:process.cmdline"]
+    }
+  }
+}

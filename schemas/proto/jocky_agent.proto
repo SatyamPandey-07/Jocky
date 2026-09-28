@@ -1,0 +1,103 @@
+// JOCKY agent <-> control-plane protocol (gRPC over TLS; optional mTLS).
+//
+// Identity: every agent owns an Ed25519 key.  Requests after Register carry
+// an `Auth` block whose signature covers
+//     "<method>|<agent_id>|<timestamp_ms>|<payload_sha256_hex>"
+// where payload_sha256 is method-specific (see comments).  The control
+// plane rejects stale timestamps and unknown keys.
+//
+// Tasks carry the execution contract as the exact canonical-JSON bytes that
+// the control plane signed, plus the detached Ed25519 signature.
+
+syntax = "proto3";
+
+package jocky.agent.v1;
+
+service AgentService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Poll(PollRequest) returns (PollResponse);
+  rpc UpdateTask(TaskUpdate) returns (Ack);
+  rpc SubmitEvidence(EvidenceBatch) returns (Ack);
+  rpc SubmitArtifact(ArtifactChunk) returns (Ack);
+}
+
+message Auth {
+  string agent_id = 1;
+  int64 timestamp_ms = 2;
+  bytes signature = 3;
+}
+
+message RegisterRequest {
+  string host_id = 1;           // e.g. WIN-01
+  string platform = 2;          // windows | linux | offline
+  string os = 3;
+  string agent_version = 4;
+  bytes public_key = 5;         // raw Ed25519 public key (32 bytes)
+  string enrollment_token = 6;
+  repeated string collectors = 7;
+  repeated string capabilities = 8;  // local capability allowlist
+  string hostname = 9;
+  int64 timestamp_ms = 10;
+  bytes signature = 11;         // signs "Register|<host_id>|<timestamp_ms>|<hex(public_key)>"
+}
+
+message RegisterResponse {
+  string agent_id = 1;
+  bytes control_plane_public_key = 2;
+  string control_plane_key_id = 3;
+  uint32 poll_interval_ms = 4;
+}
+
+// payload_sha256 = sha256("")
+message PollRequest {
+  Auth auth = 1;
+}
+
+message Task {
+  string task_id = 1;
+  string execution_id = 2;
+  bytes contract = 3;             // canonical JSON of the contract body (signed bytes)
+  bytes contract_signature = 4;   // Ed25519 signature over `contract`
+  string contract_key_id = 5;
+}
+
+message PollResponse {
+  repeated Task tasks = 1;
+  uint32 poll_interval_ms = 2;
+}
+
+// payload_sha256 = sha256(task_id "\n" state "\n" message "\n" detail_json)
+message TaskUpdate {
+  Auth auth = 1;
+  string task_id = 2;
+  string state = 3;     // RECEIVED VERIFIED REJECTED RUNNING UPLOADING COMPLETED FAILED
+  string message = 4;
+  bytes detail_json = 5;
+}
+
+// payload_sha256 = sha256(task_id "\n" stream_id "\n" seq "\n" records_sha256 "\n" last)
+message EvidenceBatch {
+  Auth auth = 1;
+  string task_id = 2;
+  string stream_id = 3;
+  uint32 seq = 4;
+  bytes records_jsonl = 5;       // canonical JSON evidence records, one per line
+  string records_sha256 = 6;     // sha256 of records_jsonl
+  uint32 record_count = 7;
+  bool last = 8;
+}
+
+// payload_sha256 = sha256(task_id "\n" evidence_id "\n" sha256)
+message ArtifactChunk {
+  Auth auth = 1;
+  string task_id = 2;
+  string evidence_id = 3;
+  string sha256 = 4;             // sha256 of the full content
+  uint64 size = 5;
+  bytes content = 6;
+}
+
+message Ack {
+  bool ok = 1;
+  string message = 2;
+}

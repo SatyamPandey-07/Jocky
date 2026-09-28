@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jocky"
+version = "0.1.0"
+description = "JOCKY: evidence-aware forensic investigation language, compiler and reference runtime"
+requires-python = ">=3.10"
+dependencies = ["cryptography>=42"]
+
+[project.scripts]
+jocky = "jocky.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["jocky*"]

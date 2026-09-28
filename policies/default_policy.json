@@ -1,0 +1,26 @@
+{
+  "name": "default",
+  "version": 1,
+  "description": "Standard JOCKY read-only forensics policy permitting canonical collections.",
+  "default": {
+    "allow": [
+      "collect:*",
+      "preserve:records"
+    ],
+    "deny": []
+  },
+  "targets": {
+    "WIN-01": {
+      "allow": ["collect:*", "preserve:records"]
+    },
+    "WIN-02": {
+      "allow": ["collect:*", "preserve:records"]
+    },
+    "UBUNTU-01": {
+      "allow": ["collect:*", "preserve:records"]
+    },
+    "OFFLINE-01": {
+      "allow": ["collect:*", "preserve:records"]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+// Incident #42 — the paper's running scenario.
+//
+// A PowerShell process creates a file and then opens an outbound network
+// connection, all within 20 minutes.  The same source runs unchanged on
+// Windows endpoints, Linux endpoints (pwsh) and offline evidence.
+
+investigation incident_42 {
+    title   "PowerShell dropped a file, then connected out"
+    targets ["WIN-01", "WIN-02", "UBUNTU-01", "OFFLINE-01"]
+    window  last 24h
+
+    let shells = observe Process
+        | filter name in ["powershell.exe", "pwsh.exe", "pwsh"]
+        | select pid, ppid, name, path, user
+
+    let drops = observe File
+        | filter action == "create"
+        | select pid, path, name, extension, size
+
+    let beacons = observe NetworkConnection
+        | filter direction == "outbound" and not remote_ip in cidr("127.0.0.0/8")
+        | select pid, protocol, remote_ip, remote_port, state
+
+    let chain = sequence shells -> drops -> beacons
+        on host, pid
+        within 20m
+
+    preserve chain
+
+    emit finding chain
+        as "PowerShell -> file creation -> network connection within 20m"
+        severity high
+}

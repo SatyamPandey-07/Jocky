@@ -1,0 +1,100 @@
+{
+  "schema_version": "jocky.entities/0.1",
+  "description": "JOCKY MVP five-entity evidence schema. Every normalized evidence record carries the envelope fields; entity fields live under `fields`. `host` and `time` are addressable from JOCKY expressions but are stored in the envelope.",
+  "envelope": [
+    "evidence_id",
+    "entity",
+    "host",
+    "time",
+    "time_source",
+    "observed_at",
+    "collector",
+    "collector_version",
+    "source",
+    "execution_id",
+    "contract_hash",
+    "fields",
+    "sha256"
+  ],
+  "types": ["str", "int", "time", "ip", "bool"],
+  "entities": {
+    "Process": {
+      "doc": "A process observed on a host. `time` is the process start time.",
+      "capability": "collect:process",
+      "fields": {
+        "host": { "type": "str", "doc": "endpoint identifier" },
+        "time": { "type": "time", "doc": "process start time (UTC)" },
+        "pid": { "type": "int" },
+        "ppid": { "type": "int" },
+        "name": { "type": "str", "doc": "image name, e.g. powershell.exe" },
+        "path": { "type": "str", "doc": "full image path" },
+        "cmdline": { "type": "str", "capability": "collect:process.cmdline", "doc": "command line (may contain secrets; separately gated)" },
+        "user": { "type": "str" }
+      },
+      "natural_key": ["host", "pid", "time"]
+    },
+    "File": {
+      "doc": "A file-system object. `time` is the creation (birth) time; `pid` is the attributed process, when attribution is possible.",
+      "capability": "collect:file",
+      "fields": {
+        "host": { "type": "str" },
+        "time": { "type": "time", "doc": "file creation time (UTC)" },
+        "pid": { "type": "int", "doc": "attributed process id (null when unattributed)" },
+        "path": { "type": "str" },
+        "name": { "type": "str" },
+        "extension": { "type": "str" },
+        "size": { "type": "int" },
+        "action": { "type": "str", "doc": "create | modify | delete | open" },
+        "attribution": { "type": "str", "doc": "how pid was attributed: event | open-handle | none" },
+        "sha256": { "type": "str", "capability": "collect:file.hash", "doc": "content hash (requires reading the file)" }
+      },
+      "natural_key": ["host", "path", "time", "pid"]
+    },
+    "NetworkConnection": {
+      "doc": "A network socket/connection. `time` is the connection creation time when the OS records it, otherwise the first observation time (see time_source).",
+      "capability": "collect:network",
+      "fields": {
+        "host": { "type": "str" },
+        "time": { "type": "time" },
+        "pid": { "type": "int" },
+        "protocol": { "type": "str", "doc": "tcp | udp" },
+        "direction": { "type": "str", "doc": "outbound | inbound | listen | bound" },
+        "state": { "type": "str" },
+        "local_ip": { "type": "ip" },
+        "local_port": { "type": "int" },
+        "remote_ip": { "type": "ip" },
+        "remote_port": { "type": "int" }
+      },
+      "natural_key": ["host", "pid", "protocol", "local_ip", "local_port", "remote_ip", "remote_port", "time"]
+    },
+    "User": {
+      "doc": "A user account known to a host. `time` is the observation time.",
+      "capability": "collect:user",
+      "fields": {
+        "host": { "type": "str" },
+        "time": { "type": "time" },
+        "name": { "type": "str" },
+        "uid": { "type": "str", "doc": "UID (Linux) or SID (Windows)" },
+        "domain": { "type": "str" },
+        "home": { "type": "str" }
+      },
+      "natural_key": ["host", "name", "uid"]
+    },
+    "Event": {
+      "doc": "A log event (Windows Event Log, syslog, or an offline log export).",
+      "capability": "collect:event",
+      "fields": {
+        "host": { "type": "str" },
+        "time": { "type": "time" },
+        "channel": { "type": "str" },
+        "provider": { "type": "str" },
+        "event_id": { "type": "int" },
+        "record_id": { "type": "int" },
+        "level": { "type": "str" },
+        "pid": { "type": "int" },
+        "message": { "type": "str" }
+      },
+      "natural_key": ["host", "channel", "provider", "event_id", "record_id", "time"]
+    }
+  }
+}

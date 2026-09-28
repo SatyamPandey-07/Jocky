@@ -1,0 +1,7 @@
+COMPILER_VERSION = "jockyc 0.1.0"
+IR_FORMAT = "jocky.ir/0.1"
+PLAN_FORMAT = "jocky.plan/0.1"
+CONTRACT_FORMAT = "jocky.contract/0.1"
+EVIDENCE_FORMAT = "jocky.evidence/0.1"
+FINDING_FORMAT = "jocky.finding/0.1"
+RUNTIME_VERSION = "jocky-runtime-py 0.1.0"

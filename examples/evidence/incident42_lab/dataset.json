@@ -1,0 +1,63 @@
+{
+  "format": "jocky.dataset/0.1",
+  "name": "incident42-lab",
+  "synthetic": true,
+  "description": "Hand-specified lab dataset for the Incident #42 scenario (synthetic). 2 true incidents and 6 negative controls; see ground_truth.json.",
+  "reference_time": "2026-09-28T12:00:00.000000Z",
+  "default_host": "OFFLINE-01",
+  "sources": [
+    {
+      "entity": "Process",
+      "path": "process.jsonl",
+      "format": "jsonl",
+      "time_source": "start",
+      "fields": {
+        "host": "Computer",
+        "time": "UtcTime",
+        "pid": "ProcessId",
+        "ppid": "ParentProcessId",
+        "name": "ImageName",
+        "path": "Image",
+        "cmdline": "CommandLine",
+        "user": "User"
+      }
+    },
+    {
+      "entity": "File",
+      "path": "file_events.csv",
+      "format": "csv",
+      "time_source": "birth"
+    },
+    {
+      "entity": "NetworkConnection",
+      "path": "network.json",
+      "format": "json",
+      "time_source": "event",
+      "fields": {
+        "local_ip": "local.ip",
+        "local_port": "local.port",
+        "remote_ip": "remote.ip",
+        "remote_port": "remote.port"
+      }
+    },
+    {
+      "entity": "User",
+      "path": "users.jsonl",
+      "format": "jsonl",
+      "time_source": "observed"
+    },
+    {
+      "entity": "Event",
+      "path": "events.jsonl",
+      "format": "jsonl",
+      "time_source": "event"
+    }
+  ],
+  "counts": {
+    "process": 44,
+    "file": 43,
+    "network": 44,
+    "user": 3,
+    "event": 36
+  }
+}

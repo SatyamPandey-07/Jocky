@@ -1,0 +1,706 @@
+[
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T02:02:00.000000Z",
+"pid": 1000,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50000
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T02:19:00.000000Z",
+"pid": 1001,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50001
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T02:36:00.000000Z",
+"pid": 1002,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50002
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T02:53:00.000000Z",
+"pid": 1003,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50003
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T03:10:00.000000Z",
+"pid": 1004,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50004
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T03:27:00.000000Z",
+"pid": 1005,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50005
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T03:44:00.000000Z",
+"pid": 1006,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50006
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T04:01:00.000000Z",
+"pid": 1007,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50007
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T04:18:00.000000Z",
+"pid": 1008,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50008
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T04:35:00.000000Z",
+"pid": 1009,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50009
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T04:52:00.000000Z",
+"pid": 1010,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50010
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T05:09:00.000000Z",
+"pid": 1011,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50011
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T02:02:00.000000Z",
+"pid": 1100,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50000
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T02:19:00.000000Z",
+"pid": 1101,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50001
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T02:36:00.000000Z",
+"pid": 1102,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50002
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T02:53:00.000000Z",
+"pid": 1103,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50003
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T03:10:00.000000Z",
+"pid": 1104,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50004
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T03:27:00.000000Z",
+"pid": 1105,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50005
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T03:44:00.000000Z",
+"pid": 1106,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50006
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T04:01:00.000000Z",
+"pid": 1107,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50007
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T04:18:00.000000Z",
+"pid": 1108,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50008
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T04:35:00.000000Z",
+"pid": 1109,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50009
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T04:52:00.000000Z",
+"pid": 1110,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50010
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T05:09:00.000000Z",
+"pid": 1111,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 50011
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T02:02:00.000000Z",
+"pid": 1200,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40000
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T02:19:00.000000Z",
+"pid": 1201,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40001
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T02:36:00.000000Z",
+"pid": 1202,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40002
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T02:53:00.000000Z",
+"pid": 1203,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40003
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T03:10:00.000000Z",
+"pid": 1204,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40004
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T03:27:00.000000Z",
+"pid": 1205,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40005
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T03:44:00.000000Z",
+"pid": 1206,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40006
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T04:01:00.000000Z",
+"pid": 1207,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40007
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T04:18:00.000000Z",
+"pid": 1208,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40008
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T04:35:00.000000Z",
+"pid": 1209,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40009
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T04:52:00.000000Z",
+"pid": 1210,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40010
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T05:09:00.000000Z",
+"pid": 1211,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 40011
+},
+"remote": {
+"ip": "10.0.5.20",
+"port": 5432
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T09:05:00.000000Z",
+"pid": 4242,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 51515
+},
+"remote": {
+"ip": "203.0.113.50",
+"port": 443
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T10:09:00.000000Z",
+"pid": 777,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 44100
+},
+"remote": {
+"ip": "198.51.100.7",
+"port": 8443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T06:45:00.000000Z",
+"pid": 5100,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 52000
+},
+"remote": {
+"ip": "203.0.113.77",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T06:33:00.000000Z",
+"pid": 5300,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 52100
+},
+"remote": {
+"ip": "127.0.0.1",
+"port": 8080
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-28T10:01:00.000000Z",
+"pid": 4400,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 51600
+},
+"remote": {
+"ip": "203.0.113.90",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-01",
+"time": "2026-09-27T06:04:00.000000Z",
+"pid": 3000,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 51000
+},
+"remote": {
+"ip": "203.0.113.50",
+"port": 443
+}
+},
+{
+"host": "LAB-SRV-01",
+"time": "2026-09-28T10:21:00.000000Z",
+"pid": 900,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 44200
+},
+"remote": {
+"ip": "198.51.100.8",
+"port": 443
+}
+},
+{
+"host": "LAB-WS-02",
+"time": "2026-09-28T09:03:00.000000Z",
+"pid": 4242,
+"protocol": "tcp",
+"direction": "outbound",
+"state": "ESTABLISHED",
+"local": {
+"ip": "10.0.0.10",
+"port": 52200
+},
+"remote": {
+"ip": "142.250.183.14",
+"port": 443
+}
+}
+]

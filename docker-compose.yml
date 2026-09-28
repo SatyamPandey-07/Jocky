@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  control-plane:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.control-plane
+    container_name: jocky-control-plane
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///control-plane/jocky.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./control-plane:/app/control-plane
+      - ./dashboard:/app/dashboard
+      - ./datasets:/app/datasets
+      - ./examples:/app/examples
+      - ./policies:/app/policies
+    restart: unless-stopped
+
+  agent-ubuntu:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.agent
+    container_name: jocky-agent-ubuntu
+    environment:
+      - AGENT_ID=UBUNTU-01
+      - CONTROL_PLANE_URL=http://control-plane:8000
+    depends_on:
+      - control-plane
+    restart: unless-stopped
