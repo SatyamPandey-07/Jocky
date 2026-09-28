@@ -1821,8 +1821,99 @@
       }
     });
 
+    // Cinematic Auto-Demo Tour (Runs when ?demo=true in URL)
+    function startCinematicDemo() {
+      const isDemo = window.location.search.includes('demo=true');
+      if (!isDemo) return;
+
+      console.log("[Cinematic Demo] Starting 58-second full walkthrough tour...");
+      
+      // Floating indicator
+      const banner = document.createElement('div');
+      banner.id = 'demo-tour-banner';
+      banner.style.cssText = 'position:fixed;top:15px;right:220px;z-index:9999;background:rgba(46,252,113,0.15);border:1px solid #2efc71;color:#2efc71;padding:6px 14px;border-radius:20px;font-family:var(--font-mono);font-size:0.75rem;font-weight:700;box-shadow:0 0 15px rgba(46,252,113,0.3);';
+      banner.innerHTML = '🎬 RECORDING JOCKY TOUR: 0s';
+      document.body.appendChild(banner);
+
+      let elapsed = 0;
+      const timer = setInterval(() => {
+        elapsed++;
+        banner.innerHTML = `🎬 RECORDING JOCKY TOUR: ${elapsed}s / 58s`;
+        if (elapsed >= 58) clearInterval(timer);
+      }, 1000);
+
+      // Mouse wander simulation for WebGL wave parallax
+      let mouseAngle = 0;
+      const mouseInterval = setInterval(() => {
+        mouseAngle += 0.05;
+        const x = window.innerWidth * (0.5 + 0.35 * Math.sin(mouseAngle));
+        const y = window.innerHeight * (0.5 + 0.25 * Math.cos(mouseAngle));
+        window.dispatchEvent(new MouseEvent('pointermove', { clientX: x, clientY: y }));
+      }, 50);
+
+      // Phase 1 (0-10s): Hero exploration
+      // Phase 2 (10-18s): Scroll to pipeline
+      setTimeout(() => {
+        window.scrollTo({ top: 580, behavior: 'smooth' });
+      }, 10000);
+
+      // Phase 3 (18-24s): Scroll to cards
+      setTimeout(() => {
+        window.scrollTo({ top: 920, behavior: 'smooth' });
+      }, 18000);
+
+      // Phase 4 (24-30s): Scroll back up to hero, trigger IDE Run
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 24000);
+
+      setTimeout(() => {
+        quickExecuteHero();
+      }, 27000);
+
+      // Phase 5 (30-35s): Switch to Studio & Compile
+      setTimeout(() => {
+        openStudioScreen('screen-investigations');
+        compileInvestigation();
+      }, 30000);
+
+      // Phase 6 (35-40s): Switch to Compiler & Forensic IR
+      setTimeout(() => {
+        openStudioScreen('screen-compiler');
+      }, 35000);
+
+      // Phase 7 (40-45s): Switch to Fleet Matrix
+      setTimeout(() => {
+        openStudioScreen('screen-fleet');
+      }, 40000);
+
+      // Phase 8 (45-49s): Switch to Evidence Stream
+      setTimeout(() => {
+        openStudioScreen('screen-evidence');
+      }, 45000);
+
+      // Phase 9 (49-53s): Switch to Correlated Findings
+      setTimeout(() => {
+        openStudioScreen('screen-findings');
+      }, 49000);
+
+      // Phase 10 (53-57s): Switch to Provenance & Replay, trigger verification
+      setTimeout(() => {
+        openStudioScreen('screen-provenance');
+        verifyReplayExecution();
+      }, 53000);
+
+      // Phase 11 (57s): Return to landing hero
+      setTimeout(() => {
+        switchView('landing');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        clearInterval(mouseInterval);
+      }, 57000);
+    }
+
     // Initial load
     loadFleet();
+    startCinematicDemo();
   </script>
 </body>
 </html>
