@@ -78,7 +78,7 @@ class Database:
                 );
 
                 CREATE TABLE IF NOT EXISTS evidence_records (
-                    evidence_id TEXT PRIMARY KEY,
+                    evidence_id TEXT NOT NULL,
                     execution_id TEXT NOT NULL,
                     entity TEXT NOT NULL,
                     host TEXT NOT NULL,
@@ -86,7 +86,8 @@ class Database:
                     observed_at TEXT NOT NULL,
                     collector TEXT NOT NULL,
                     sha256 TEXT NOT NULL,
-                    payload TEXT NOT NULL
+                    payload TEXT NOT NULL,
+                    PRIMARY KEY (execution_id, evidence_id)
                 );
 
                 CREATE TABLE IF NOT EXISTS findings (
@@ -102,6 +103,30 @@ class Database:
                     created_at TEXT NOT NULL
                 );
             """)
+
+            # Ensure evidence_records has composite primary key
+            cursor = conn.execute("PRAGMA table_info(evidence_records)")
+            cols = cursor.fetchall()
+            if cols:
+                pk_count = sum(1 for c in cols if c["pk"] > 0)
+                if pk_count < 2:
+                    conn.executescript("""
+                        CREATE TABLE evidence_records_migrated (
+                            evidence_id TEXT NOT NULL,
+                            execution_id TEXT NOT NULL,
+                            entity TEXT NOT NULL,
+                            host TEXT NOT NULL,
+                            event_time TEXT NOT NULL,
+                            observed_at TEXT NOT NULL,
+                            collector TEXT NOT NULL,
+                            sha256 TEXT NOT NULL,
+                            payload TEXT NOT NULL,
+                            PRIMARY KEY (execution_id, evidence_id)
+                        );
+                        INSERT OR IGNORE INTO evidence_records_migrated SELECT * FROM evidence_records;
+                        DROP TABLE evidence_records;
+                        ALTER TABLE evidence_records_migrated RENAME TO evidence_records;
+                    """)
 
     # --- Investigations ---
     def save_investigation(self, id: str, name: str, title: str, source_code: str, status: str = "draft", targets: List[str] = None):
@@ -232,17 +257,17 @@ class Database:
                     exec_id,
                     r.get("entity"),
                     r.get("host"),
-                    r.get("time"),
+                    r.get("time") or r.get("event_time"),
                     r.get("observed_at", utc_now()),
                     r.get("collector", "unknown"),
                     r.get("sha256", ""),
-                    json.dumps(r.get("fields", {})),
+                    json.dumps(r),
                 )
                 for r in records
             ]
             conn.executemany(
                 """
-                INSERT OR IGNORE INTO evidence_records (evidence_id, execution_id, entity, host, event_time, observed_at, collector, sha256, payload)
+                INSERT OR REPLACE INTO evidence_records (evidence_id, execution_id, entity, host, event_time, observed_at, collector, sha256, payload)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 data,
@@ -267,8 +292,29 @@ class Database:
             rows = conn.execute(query, params).fetchall()
             results = []
             for r in rows:
-                item = dict(r)
-                item["fields"] = json.loads(item["payload"])
+                raw_payload = r["payload"]
+                try:
+                    payload_obj = json.loads(raw_payload)
+                except Exception:
+                    payload_obj = {}
+
+                if isinstance(payload_obj, dict) and "fields" in payload_obj:
+                    item = dict(payload_obj)
+                    item["execution_id"] = r["execution_id"]
+                    item["evidence_id"] = r["evidence_id"]
+                    item["entity"] = r["entity"]
+                    item["host"] = r["host"]
+                    item["event_time"] = r["event_time"]
+                    if "time" not in item:
+                        item["time"] = r["event_time"]
+                else:
+                    item = dict(r)
+                    item["fields"] = payload_obj if isinstance(payload_obj, dict) else {}
+                    item["time"] = item["event_time"]
+
+                if "time_source" not in item:
+                    item["time_source"] = "start" if item.get("entity") == "Process" else ("birth" if item.get("entity") == "File" else "event")
+
                 results.append(item)
             return results
 
