@@ -1417,6 +1417,179 @@
       padding: 1.75rem;
       box-shadow: var(--shadow-lg);
     }
+
+    /* ========================================================== */
+    /* RESPONSIVE DESIGN & MOBILE OPTIMIZATIONS                  */
+    /* ========================================================== */
+
+    @media (max-width: 1200px) {
+      header { padding: 0.85rem 1.75rem; }
+      main { padding: 2rem 1.75rem 3.5rem; }
+      .hero-split { gap: 2.5rem; }
+      .fleet-matrix-grid { grid-template-columns: repeat(2, 1fr); }
+      .dag-stepper-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 992px) {
+      header { padding: 0.75rem 1.25rem; }
+      .nav-links { gap: 1.25rem; font-size: 0.75rem; }
+      main { padding: 1.5rem 1.25rem 3rem; }
+      .hero-split { grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 3rem; }
+      .hero-title { font-size: 2.75rem; }
+      .hero-desc { font-size: 1rem; max-width: 100%; }
+      .hero-stats { gap: 1.75rem; }
+      .studio-grid-2 { grid-template-columns: 1fr; gap: 1.25rem; }
+      .arch-tier-container { grid-template-columns: 1fr; gap: 1rem; }
+      .arch-pipeline-row { overflow-x: auto; padding-bottom: 0.65rem; -webkit-overflow-scrolling: touch; }
+      .arch-step-card { min-width: 190px; }
+      .compiler-cards-grid { grid-template-columns: 1fr !important; }
+      .studio-navbar { flex-wrap: wrap; gap: 0.75rem; }
+      .studio-tabs { overflow-x: auto; width: 100%; padding-bottom: 0.35rem; -webkit-overflow-scrolling: touch; }
+      .studio-tab-btn { flex-shrink: 0; white-space: nowrap; }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 0.65rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+      }
+      .brand-logo { font-size: 1.15rem; }
+      .nav-links {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        padding: 0.25rem 0 0.4rem;
+        gap: 1rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav-link { flex-shrink: 0; white-space: nowrap; font-size: 0.72rem; }
+      .systems-status { display: none; }
+      .btn-header-studio {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.72rem;
+      }
+      main { padding: 1.25rem 0.85rem 2.5rem; }
+
+      .hero-title { font-size: 2.1rem; line-height: 1.12; }
+      .hero-desc { font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.5rem; }
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.65rem;
+        margin-bottom: 2rem;
+      }
+      .btn-hero-primary, .btn-hero-secondary {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+      }
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        padding-top: 1.25rem;
+      }
+      .stat-item h3 { font-size: 1.35rem; }
+      .stat-item p { font-size: 0.6rem; letter-spacing: 0.04em; }
+
+      .ide-body { grid-template-columns: 1fr; }
+      .ide-editor {
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+        max-height: 300px;
+        font-size: 0.72rem;
+        padding: 0.85rem;
+      }
+      .ide-sidebar { padding: 0.85rem; }
+
+      /* Architecture Tiers */
+      .arch-exact-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+      }
+      .arch-exact-header-right {
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        width: 100%;
+      }
+      .arch-exact-legend {
+        flex-wrap: wrap;
+        gap: 0.65rem;
+      }
+      .arch-canvas-card {
+        padding: 0.85rem;
+        overflow-x: hidden;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .arch-tier-container {
+        padding: 0.85rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .arch-pipeline-row {
+        overflow-x: auto;
+        width: 100%;
+        padding-bottom: 0.65rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .arch-step-card { min-width: 165px; padding: 0.75rem; min-height: 155px; }
+      .arch-output-solid { width: 90px; padding: 0.85rem 0.35rem; }
+      .arch-output-solid .main-tag { font-size: 0.7rem; }
+      .arch-verified-card { width: 130px; padding: 0.65rem; }
+      .arch-exact-footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+
+      /* Studio Elements */
+      .studio-navbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+        padding: 0.65rem;
+      }
+      .studio-tabs {
+        overflow-x: auto;
+        padding-bottom: 0.35rem;
+        gap: 0.25rem;
+      }
+      .studio-tab-btn {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.7rem;
+        flex-shrink: 0;
+      }
+      .studio-card { padding: 1rem; }
+      .studio-card-title { font-size: 0.76rem; flex-wrap: wrap; gap: 0.4rem; }
+      textarea.studio-code-area, .jocky-code-viewer, .studio-code-view {
+        height: 320px;
+        font-size: 0.75rem;
+      }
+      .dsl-syntax-legend { gap: 0.5rem; font-size: 0.62rem; }
+
+      .fleet-matrix-grid { grid-template-columns: 1fr; }
+      .dag-stepper-row { grid-template-columns: 1fr; }
+      .dag-box { height: 320px; overflow-x: auto; }
+      .dag-box svg { min-width: 620px; height: 300px; }
+      .replay-audit-grid { grid-template-columns: 1fr; }
+
+      .finding-alert-box { padding: 1rem; }
+      .finding-title-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .chain-sequence-row { gap: 0.65rem; }
+      .chain-pill { min-width: 180px; padding: 0.65rem; font-size: 0.72rem; }
+
+      /* Inspect Dialog */
+      .inspect-overlay { padding: 1rem; }
+      .inspect-dialog { padding: 1.15rem; max-width: 95vw; max-height: 90vh; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: 1.75rem; }
+      .hero-stats { grid-template-columns: 1fr 1fr; }
+      .hero-stats .stat-item:last-child { grid-column: span 2; }
+      .arch-tier-sidebar-top { flex-direction: column; gap: 0.35rem; }
+      .arch-tier-num { width: 36px; height: 36px; font-size: 1.1rem; }
+      .arch-tier-title { font-size: 0.85rem; }
+    }
   </style>
 </head>
 <body>
@@ -2273,7 +2446,7 @@
 
         <!-- SCREEN 2: COMPILER & FORENSIC IR -->
         <div id="screen-compiler" class="studio-screen">
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+          <div class="compiler-cards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
             <div class="studio-card">
               <div class="studio-card-title">1. INFERRED CAPABILITIES</div>
               <pre id="view-capabilities" class="studio-code-view">Compile source to infer required capabilities...</pre>
