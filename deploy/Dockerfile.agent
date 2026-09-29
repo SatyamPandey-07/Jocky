@@ -1,0 +1,17 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV AGENT_ID=UBUNTU-01 \
+    CONTROL_PLANE_URL=http://control-plane:8000
+
+CMD ["python", "agent/jocky_agent.py"]
